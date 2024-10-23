@@ -1,5 +1,14 @@
 import { useEffect } from "react"
 
+import crash from "../assets/crash.wav"
+import hiHat from "../assets/hiHat.wav"
+import kick from "../assets/kick.wav"
+import openHat from "../assets/openHat.wav"
+import snare from "../assets/snare.wav"
+
+let FPS = 60
+const FRAMES_PER_MINUTE = FPS * 60
+
 const WIDTH = 800
 const HEIGHT = 600
 
@@ -11,12 +20,19 @@ const OFFSET = 25
 let x = 0
 let y = 0
 
+let bpm = 240
+let framesPerBeat = FRAMES_PER_MINUTE / bpm
+let currentFrame = 0
+let currentPos = 0
+
 const notesPlayed = Array.from({
     length: ROWS
 }, () => Array(COLS).fill(0))
 
 function draw(context) {
+    currentFrame++
     drawBoard(context)
+    playSounds()
 }
 
 function drawBoard(context) {
@@ -36,6 +52,14 @@ function drawBoard(context) {
             }
         }
     }
+
+    context.fillStyle = "red"
+    context.font = "20px sans-serif"
+    context.fillText("Crash", 430, 45)
+    context.fillText("Open Hat", 430, 70)
+    context.fillText("Closed Hat", 430, 95)
+    context.fillText("Snare", 430, 120)
+    context.fillText("Kick", 430, 145)
 }
 
 function getPosition(e, canvas) {
@@ -58,17 +82,61 @@ function collision(context) {
     }
 }
 
-export default function Board() {
+function playSound(src) {
+    let sound = new Audio(src)
+    sound.play()
+}
 
+function playSounds() {
+    if (currentFrame % framesPerBeat === 0) {
+        currentPos++
+        if (currentPos >= notesPlayed[0].length) {
+            currentPos = 0
+        }
+
+        for (let r = 0; r < ROWS; r++) {
+            if (notesPlayed[r][currentPos] === 1) {
+                let src = ""
+                switch (r) {
+                    case 0:
+                        src = crash
+                        break
+                    case 1:
+                        src = openHat
+                        break
+                    case 2:
+                        src = hiHat
+                        break
+                    case 3:
+                        src = snare
+                        break
+                    case 4:
+                        src = kick
+                        break
+                }
+
+                playSound(src)
+            }
+        }
+    }
+}
+
+export default function Board() {
     useEffect(() => {
         const canvas = document.getElementById("myCanvas")
         const context = canvas.getContext("2d")
+
+        function gameLoop() {
+            draw(context)
+            requestAnimationFrame(gameLoop)
+        }
+
         canvas.addEventListener("mousedown", (e) => {
             getPosition(e, canvas)
             collision(context)
         }, false)
 
-        draw(context)
+        gameLoop()
 
         return () => {
             canvas.removeEventListener("mousedown", getPosition)
