@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import "./Board.css"
 
 import crash from "../assets/crash.wav"
 import hiHat from "../assets/hiHat.wav"
@@ -9,8 +10,8 @@ import snare from "../assets/snare.wav"
 let FPS = 60
 const FRAMES_PER_MINUTE = FPS * 60
 
-const WIDTH = 800
-const HEIGHT = 600
+const WIDTH = 550
+const HEIGHT = 175
 
 const ROWS = 5
 const COLS = 16
@@ -47,13 +48,13 @@ function drawBoard(context) {
             context.strokeRect(cellX, cellY, CELL_SIZE, CELL_SIZE)
 
             if (notesPlayed[r][c] === 1) {
-                context.fillStyle = "green"
+                context.fillStyle = "#22c55e"
                 context.fillRect(cellX, cellY, CELL_SIZE, CELL_SIZE)
             }
         }
     }
 
-    context.fillStyle = "red"
+    context.fillStyle = "#999"
     context.font = "20px sans-serif"
     context.fillText("Crash", 430, 45)
     context.fillText("Open Hat", 430, 70)
