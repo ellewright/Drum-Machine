@@ -2,8 +2,8 @@ import { useEffect } from "react"
 import { draw, getPosition, collision } from "../functions/board"
 import "./Board.css"
 
-const WIDTH = 550
-const HEIGHT = 175
+const WIDTH = 600
+const HEIGHT = 275
 
 export default function Board() {
     useEffect(() => {

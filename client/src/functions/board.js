@@ -14,6 +14,7 @@ const CELL_SIZE = 25
 const OFFSET = 25
 
 const LIGHT_GRAY = "#999"
+const RED = "#ef4444"
 const GREEN = "#22c55e"
 
 const FONT = "sans-serif"
@@ -22,7 +23,7 @@ let x = 0
 let y = 0
 
 let bpm = 240
-let framesPerBeat = FRAMES_PER_MINUTE / bpm
+let framesPerBeat = Math.floor(FRAMES_PER_MINUTE / bpm)
 let currentFrame = 0
 let currentPos = 0
 
@@ -33,10 +34,11 @@ const notesPlayed = Array.from({
 export function draw(context) {
     currentFrame++
     drawBoard(context)
+    drawUI(context)
     playSounds()
 }
 
-export function drawBoard(context) {
+function drawBoard(context) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height)
 
     for (let r = 0; r < ROWS; r++) {
@@ -63,6 +65,37 @@ export function drawBoard(context) {
     context.fillText("Kick", 430, 145)
 }
 
+function drawUI(context) {
+    context.fillStyle = "black"
+    context.fillText("BPM:", 50, 200)
+    context.rect(50, 220, 40, 40)
+    context.stroke()
+    context.font = `50px ${FONT}`
+    context.fillStyle = RED
+    context.fillText("-", 62.5, 252.5)
+    context.rect(220, 220, 40, 40)
+    context.stroke()
+    context.font = `50px ${FONT}`
+    context.fillStyle = GREEN
+    context.fillText("+", 225, 257.5)
+    context.fillStyle = LIGHT_GRAY
+    context.fillText(bpm, 112.5, 257.5)
+
+    if (x >= 50 && x < 90 && y >= 220 && y < 260) {
+        bpm -= 5
+        framesPerBeat = Math.floor(FRAMES_PER_MINUTE / bpm)
+        x = -1
+        y = -1
+    }
+
+    if (x >= 220 && x < 260 && y >= 220 && y < 260) {
+        bpm += 5
+        framesPerBeat = Math.floor(FRAMES_PER_MINUTE / bpm)
+        x = -1
+        y = -1
+    }
+}
+
 export function getPosition(e, canvas) {
     x = e.clientX - canvas.offsetLeft
     y = e.clientY - canvas.offsetTop
@@ -83,12 +116,12 @@ export function collision(context) {
     }
 }
 
-export function playSound(src) {
+function playSound(src) {
     let sound = new Audio(src)
     sound.play()
 }
 
-export function playSounds() {
+function playSounds() {
     if (currentFrame % framesPerBeat === 0) {
         currentPos++
         if (currentPos >= notesPlayed[0].length) {
