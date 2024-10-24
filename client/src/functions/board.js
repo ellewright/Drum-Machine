@@ -19,11 +19,11 @@ const COLORS = {
 }
 
 const SOUNDS = [
-    crash,
-    openHat,
-    hiHat,
-    snare,
-    kick
+    new Audio(crash),
+    new Audio(openHat),
+    new Audio(hiHat),
+    new Audio(snare),
+    new Audio(kick),
 ]
 
 const LABELS = [
@@ -184,8 +184,7 @@ export function collision(context) {
 }
 
 function playSound(src) {
-    let sound = new Audio(src)
-    sound.play()
+    src.play()
 }
 
 function playSounds() {
