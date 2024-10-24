@@ -44,6 +44,8 @@ let currentPos = 0
 let x = 0
 let y = 0
 
+let isPlaying = false
+
 const notesPlayed = Array.from({
     length: ROWS
 }, () => Array(COLS).fill(0))
@@ -52,7 +54,9 @@ export function draw(context) {
     currentFrame++
     drawBoard(context)
     drawUI(context)
-    playSounds()
+    if (isPlaying) {
+        playSounds()
+    }
 }
 
 function drawBoard(context) {
@@ -87,6 +91,7 @@ function drawLabels(context) {
 
 function drawUI(context) {
     drawBpm(context)
+    drawPlayPause(context)
 }
 
 function drawBpm(context) {
@@ -126,6 +131,36 @@ function updateBpm(change) {
     framesPerBeat = Math.floor(FRAMES_PER_MINUTE / bpm)
     x = -1
     y = -1
+}
+
+function drawPlayPause(context) {
+    context.rect(25, 220, 40, 40)
+    context.stroke()
+
+    context.font = `30px ${FONT}`
+    context.fillStyle = COLORS.GREEN
+    context.fillText("►", 30, 250)
+
+    context.rect(90, 220, 40, 40)
+    context.stroke()
+
+    context.font = `20px ${FONT}`
+    context.fillStyle = COLORS.RED
+    context.fillText("▐▐", 92.5, 246.25)
+
+    handlePlayPause()
+}
+
+function handlePlayPause() {
+    if (x >= 25 && x < 65 && y >= 220 & y < 260) {
+        isPlaying = true
+        x = -1
+        y = -1
+    } else if (x >= 90 && x < 130 && y >= 220 & y < 260) {
+        isPlaying = false
+        x = -1
+        y = -1
+    }
 }
 
 export function getPosition(e, canvas) {
