@@ -6,26 +6,43 @@ import snare from "../assets/snare.wav"
 
 const ROWS = 5
 const COLS = 16
+const CELL_SIZE = 25
+const OFFSET = 25
 
 let FPS = 60
 const FRAMES_PER_MINUTE = FPS * 60
 
-const CELL_SIZE = 25
-const OFFSET = 25
+const COLORS = {
+    LIGHT_GRAY: "#999",
+    RED: "#ef4444",
+    GREEN: "#22c55e",
+}
 
-const LIGHT_GRAY = "#999"
-const RED = "#ef4444"
-const GREEN = "#22c55e"
+const SOUNDS = [
+    crash,
+    openHat,
+    hiHat,
+    snare,
+    kick
+]
+
+const LABELS = [
+    "Crash",
+    "Open Hat",
+    "Closed Hat",
+    "Snare",
+    "Kick"
+]
 
 const FONT = "sans-serif"
-
-let x = 0
-let y = 0
 
 let bpm = 240
 let framesPerBeat = Math.floor(FRAMES_PER_MINUTE / bpm)
 let currentFrame = 0
 let currentPos = 0
+
+let x = 0
+let y = 0
 
 const notesPlayed = Array.from({
     length: ROWS
@@ -50,50 +67,65 @@ function drawBoard(context) {
             context.strokeRect(cellX, cellY, CELL_SIZE, CELL_SIZE)
 
             if (notesPlayed[r][c] === 1) {
-                context.fillStyle = GREEN
+                context.fillStyle = COLORS.GREEN
                 context.fillRect(cellX, cellY, CELL_SIZE, CELL_SIZE)
             }
         }
     }
 
-    context.fillStyle = LIGHT_GRAY
+    drawLabels(context)
+}
+
+function drawLabels(context) {
+    context.fillStyle = COLORS.LIGHT_GRAY
     context.font = `20px ${FONT}`
-    context.fillText("Crash", 430, 45)
-    context.fillText("Open Hat", 430, 70)
-    context.fillText("Closed Hat", 430, 95)
-    context.fillText("Snare", 430, 120)
-    context.fillText("Kick", 430, 145)
+
+    LABELS.forEach((label, index) => {
+        context.fillText(label, 430, 45 + (index * 25))
+    })
 }
 
 function drawUI(context) {
-    context.fillStyle = "black"
-    context.fillText("BPM:", 50, 200)
-    context.rect(50, 220, 40, 40)
-    context.stroke()
-    context.font = `50px ${FONT}`
-    context.fillStyle = RED
-    context.fillText("-", 62.5, 252.5)
-    context.rect(220, 220, 40, 40)
-    context.stroke()
-    context.font = `50px ${FONT}`
-    context.fillStyle = GREEN
-    context.fillText("+", 225, 257.5)
-    context.fillStyle = LIGHT_GRAY
-    context.fillText(bpm, 112.5, 257.5)
+    drawBpm(context)
+}
 
-    if (x >= 50 && x < 90 && y >= 220 && y < 260) {
-        bpm -= 5
-        framesPerBeat = Math.floor(FRAMES_PER_MINUTE / bpm)
-        x = -1
-        y = -1
-    }
+function drawBpm(context) {
+    context.fillStyle = COLORS.LIGHT_GRAY
+    context.font = `20px ${FONT}`
+    context.fillText("BPM:", 350, 200)
 
-    if (x >= 220 && x < 260 && y >= 220 && y < 260) {
-        bpm += 5
-        framesPerBeat = Math.floor(FRAMES_PER_MINUTE / bpm)
-        x = -1
-        y = -1
+    context.rect(350, 220, 40, 40)
+    context.stroke()
+
+    context.font = `50px ${FONT}`
+    context.fillStyle = COLORS.RED
+    context.fillText("-", 362.5, 252.5)
+
+    context.rect(520, 220, 40, 40)
+    context.stroke()
+
+    context.fillStyle = COLORS.GREEN
+    context.fillText("+", 525, 257.5)
+
+    context.fillStyle = COLORS.LIGHT_GRAY
+    context.fillText(bpm, 412.5, 257.5)
+
+    handleBpmAdjust()
+}
+
+function handleBpmAdjust() {
+    if (x >= 350 && x < 390 && y >= 220 && y < 260) {
+        updateBpm(-5)
+    } else if (x >= 520 && x < 560 && y >= 220 && y < 260) {
+        updateBpm(5)
     }
+}
+
+function updateBpm(change) {
+    bpm = Math.max(60, bpm + change)
+    framesPerBeat = Math.floor(FRAMES_PER_MINUTE / bpm)
+    x = -1
+    y = -1
 }
 
 export function getPosition(e, canvas) {
@@ -123,34 +155,12 @@ function playSound(src) {
 
 function playSounds() {
     if (currentFrame % framesPerBeat === 0) {
-        currentPos++
-        if (currentPos >= notesPlayed[0].length) {
-            currentPos = 0
-        }
+        currentPos = (currentPos + 1) % COLS
 
-        for (let r = 0; r < ROWS; r++) {
-            if (notesPlayed[r][currentPos] === 1) {
-                let src = ""
-                switch (r) {
-                    case 0:
-                        src = crash
-                        break
-                    case 1:
-                        src = openHat
-                        break
-                    case 2:
-                        src = hiHat
-                        break
-                    case 3:
-                        src = snare
-                        break
-                    case 4:
-                        src = kick
-                        break
-                }
-
-                playSound(src)
+        notesPlayed.forEach((row, index) => {
+            if (row[currentPos] === 1) {
+                playSound(SOUNDS[index])
             }
-        }
+        })
     }
 }
