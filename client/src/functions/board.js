@@ -113,16 +113,16 @@ function drawBpm(context) {
     context.fillText("+", 525, 257.5)
 
     context.fillStyle = COLORS.LIGHT_GRAY
-    context.fillText(bpm, 412.5, 257.5)
+    context.fillText(bpm / 2, 412.5, 257.5)
 
     handleBpmAdjust()
 }
 
 function handleBpmAdjust() {
     if (x >= 350 && x < 390 && y >= 220 && y < 260) {
-        updateBpm(-5)
+        updateBpm(-10)
     } else if (x >= 520 && x < 560 && y >= 220 && y < 260) {
-        updateBpm(5)
+        updateBpm(10)
     }
 }
 
